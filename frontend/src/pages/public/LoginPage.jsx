@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiAlertCircle, FiLoader } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth.js";
+import { useToast } from "../../context/ToastContext.jsx";
+import { setAuthToast } from "../../context/AuthContext.jsx";
 import { routeByRole } from "../../utils/appConstants.js";
 
 const sampleAccounts = [
@@ -11,17 +14,24 @@ const sampleAccounts = [
 ];
 
 export function LoginPage() {
+  const emailRef = useRef(null);
   const { register, handleSubmit, setValue } = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
   const { login } = useAuth();
+  const showToast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setAuthToast(showToast);
+  }, [showToast]);
+
+  useEffect(() => {
+    emailRef.current?.focus();
+  }, []);
 
   async function onSubmit(values) {
     setError("");
@@ -32,7 +42,9 @@ export function LoginPage() {
       const destination = location.state?.from?.pathname || routeByRole[authenticated.user.role];
       navigate(destination, { replace: true });
     } catch (submitError) {
-      setError(submitError.response?.data?.message || "Login failed. Please verify your credentials.");
+      const msg = submitError.response?.data?.message || "Login failed. Please verify your credentials.";
+      setError(msg);
+      showToast(msg, "error");
     } finally {
       setSubmitting(false);
     }
@@ -80,6 +92,7 @@ export function LoginPage() {
           <label className="grid gap-2 text-sm font-medium text-slate-700">
             Email
             <input
+              ref={emailRef}
               type="email"
               placeholder="name@srms.edu"
               {...register("email")}
@@ -97,14 +110,26 @@ export function LoginPage() {
             />
           </label>
 
-          {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p> : null}
+          {error ? (
+            <div className="flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">
+              <FiAlertCircle className="shrink-0" />
+              <p>{error}</p>
+            </div>
+          ) : null}
 
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {submitting ? "Signing in..." : "Login"}
+            {submitting ? (
+              <>
+                <FiLoader className="animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 

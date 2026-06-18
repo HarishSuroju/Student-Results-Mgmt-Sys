@@ -16,7 +16,7 @@ import {
 import { api } from "../../services/api.js";
 import { PageHero } from "../../components/PageHero.jsx";
 import { SectionCard } from "../../components/SectionCard.jsx";
-import { LoadingState } from "../../components/LoadingState.jsx";
+import { DashboardSkeleton } from "../../components/Skeleton.jsx";
 
 const pieColors = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#0ea5e9"];
 
@@ -28,44 +28,52 @@ export function AnalyticsPage() {
   }, []);
 
   if (!analytics) {
-    return <LoadingState label="Loading analytics charts..." />;
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Admin · Analytics"
+        eyebrow="Admin - Analytics"
         title="Read performance trends at the course, semester, and subject level."
         description="These charts surface where students thrive, which courses need intervention, and how semester-level pass rates move over time."
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <SectionCard title="Course-wise Results" subtitle="Average marks and pass percentage across each program.">
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics.courseWiseResults}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="course_name" tick={{ fill: "#475569", fontSize: 12 }} />
-                <YAxis tick={{ fill: "#475569", fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="average_marks" fill="#4f46e5" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {analytics.courseWiseResults?.length ? (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.courseWiseResults}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="course_name" tick={{ fill: "#475569", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#475569", fontSize: 12 }} />
+                  <Tooltip />
+                  <Bar dataKey="average_marks" fill="#4f46e5" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="py-12 text-center text-sm text-slate-500">No course data available yet.</p>
+          )}
         </SectionCard>
 
         <SectionCard title="Semester-wise Results" subtitle="Average marks trend by semester.">
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={analytics.semesterWiseResults}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="semester" tick={{ fill: "#475569", fontSize: 12 }} />
-                <YAxis tick={{ fill: "#475569", fontSize: 12 }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="average_marks" stroke="#10b981" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {analytics.semesterWiseResults?.length ? (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analytics.semesterWiseResults}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="semester" tick={{ fill: "#475569", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#475569", fontSize: 12 }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="average_marks" stroke="#10b981" strokeWidth={3} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="py-12 text-center text-sm text-slate-500">No semester data available yet.</p>
+          )}
         </SectionCard>
       </div>
 
@@ -94,17 +102,21 @@ export function AnalyticsPage() {
         </SectionCard>
 
         <SectionCard title="Average Marks by Subject" subtitle="Subject-level view for spotting strong and weak academic areas.">
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics.averageMarksPerSubject}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="subject_code" tick={{ fill: "#475569", fontSize: 12 }} />
-                <YAxis tick={{ fill: "#475569", fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="average_marks" fill="#0ea5e9" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {analytics.averageMarksPerSubject?.length ? (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.averageMarksPerSubject}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="subject_code" tick={{ fill: "#475569", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#475569", fontSize: 12 }} />
+                  <Tooltip />
+                  <Bar dataKey="average_marks" fill="#0ea5e9" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="py-12 text-center text-sm text-slate-500">No subject data available yet.</p>
+          )}
         </SectionCard>
       </div>
     </div>

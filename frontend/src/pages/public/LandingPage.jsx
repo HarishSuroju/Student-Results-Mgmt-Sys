@@ -3,7 +3,7 @@ import { FiArrowRight, FiBookOpen, FiShield, FiTrendingUp, FiUsers } from "react
 
 const audienceCards = [
   {
-    title: "Prospective Admin Teams",
+    title: "Admin Teams",
     text: "Launch a secure result workflow with role-based access, analytics, and deployment-ready architecture.",
     icon: FiShield,
   },
@@ -20,9 +20,9 @@ const audienceCards = [
 ];
 
 const pillars = [
-  "Audience-aware navigation that adapts to admin, faculty, and student journeys.",
-  "Clean card-driven layouts with strong contrast, quick scanning, and mobile-ready responsiveness.",
-  "Academic storytelling with progress timelines, analytics, and clearly staged semester progress.",
+  "Role-aware navigation for admin, faculty, and student journeys.",
+  "Clean card-driven layouts with strong contrast and mobile-ready responsiveness.",
+  "Academic storytelling with progress timelines, analytics, and semester tracking.",
 ];
 
 export function LandingPage() {
@@ -30,7 +30,7 @@ export function LandingPage() {
     <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 md:px-8">
       <header className="flex items-center justify-between rounded-full border border-white/70 bg-white/80 px-5 py-4 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.45)] backdrop-blur">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-600">Summit Ridge</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-600">SRMS</p>
           <h1 className="font-display text-xl text-slate-950">Student Result Management System</h1>
         </div>
         <Link
@@ -45,12 +45,12 @@ export function LandingPage() {
       <main className="grid flex-1 gap-8 py-8 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
         <section className="rounded-[2.5rem] border border-white/70 bg-white/85 p-8 shadow-[0_30px_90px_-50px_rgba(15,23,42,0.45)] backdrop-blur md:p-12">
           <p className="text-xs font-semibold uppercase tracking-[0.45em] text-indigo-600">Modern College Platform</p>
-          <h2 className="mt-4 font-display text-5xl leading-tight text-slate-950 md:text-6xl">
+          <h2 className="mt-4 font-display text-4xl leading-tight text-slate-950 md:text-5xl lg:text-6xl">
             A results portal built for clear decisions and confident academic journeys.
           </h2>
           <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
             This SRMS combines secure authentication, faculty marks workflows, student-grade visibility, and analytics
-            dashboards in one production-ready experience designed for RDS-backed deployments.
+            dashboards in one production-ready experience.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -64,7 +64,7 @@ export function LandingPage() {
             </div>
             <div className="rounded-[1.75rem] bg-emerald-500 p-5 text-white">
               <p className="text-4xl font-display">AWS</p>
-              <p className="mt-2 text-sm text-emerald-50">RDS and EC2 friendly architecture</p>
+              <p className="mt-2 text-sm text-emerald-50">RDS and EC2 friendly</p>
             </div>
           </div>
 
@@ -78,14 +78,17 @@ export function LandingPage() {
             </Link>
             <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm text-slate-600">
               <FiTrendingUp className="text-indigo-600" />
-              Responsive, accessible, role-aware dashboards
+              Responsive, accessible, role-aware
             </div>
           </div>
         </section>
 
         <section className="grid gap-5">
           {audienceCards.map(({ title, text, icon: Icon }) => (
-            <article key={title} className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.45)]">
+            <article
+              key={title}
+              className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.45)] transition hover:shadow-[0_30px_80px_-30px_rgba(15,23,42,0.5)]"
+            >
               <div className="inline-flex rounded-2xl bg-indigo-50 p-3 text-indigo-600">
                 <Icon className="text-xl" />
               </div>
@@ -106,6 +109,11 @@ export function LandingPage() {
           ))}
         </div>
       </section>
+
+      <footer className="mt-8 rounded-[2rem] border border-white/50 bg-white/50 px-6 py-6 text-center backdrop-blur">
+        <p className="text-sm text-slate-500">Student Result Management System - Built for academic institutions</p>
+        <p className="mt-1 text-xs text-slate-400">Secure authentication - Role-based access - Analytics-ready</p>
+      </footer>
     </div>
   );
 }

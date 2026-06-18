@@ -3,7 +3,7 @@ import { api } from "../../services/api.js";
 import { PageHero } from "../../components/PageHero.jsx";
 import { StatCard } from "../../components/StatCard.jsx";
 import { SectionCard } from "../../components/SectionCard.jsx";
-import { LoadingState } from "../../components/LoadingState.jsx";
+import { DashboardSkeleton } from "../../components/Skeleton.jsx";
 import { uniqueSubjects } from "../../utils/resultHelpers.js";
 
 export function FacultyDashboardPage() {
@@ -20,7 +20,7 @@ export function FacultyDashboardPage() {
   const managedSubjects = useMemo(() => uniqueSubjects(results || []), [results]);
 
   if (!results || !students) {
-    return <LoadingState label="Loading faculty dashboard..." />;
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -47,29 +47,33 @@ export function FacultyDashboardPage() {
                 </span>
               ))
             ) : (
-              <p className="text-sm text-slate-500">Start adding marks to build your subject dashboard.</p>
+              <p className="py-4 text-sm text-slate-500">Start adding marks to build your subject dashboard.</p>
             )}
           </div>
         </SectionCard>
 
         <SectionCard title="Recent Result Entries" subtitle="Latest marks activity recorded in the system.">
-          <div className="space-y-3">
-            {results.slice(0, 5).map((item) => (
-              <div key={item.id} className="rounded-2xl bg-slate-50 px-4 py-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-slate-900">{item.student_name}</p>
-                    <p className="text-sm text-slate-500">
-                      {item.subject_name} · Semester {item.semester}
-                    </p>
-                  </div>
-                  <div className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-                    {item.marks} / {item.grade}
+          {results.length ? (
+            <div className="space-y-3">
+              {results.slice(0, 5).map((item) => (
+                <div key={item.id} className="rounded-2xl bg-slate-50 px-4 py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-semibold text-slate-900">{item.student_name}</p>
+                      <p className="text-sm text-slate-500">
+                        {item.subject_name} - Semester {item.semester}
+                      </p>
+                    </div>
+                    <div className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+                      {item.marks} / {item.grade}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="py-6 text-center text-sm text-slate-500">No result entries yet. Start adding marks from the Marks page.</p>
+          )}
         </SectionCard>
       </div>
     </div>

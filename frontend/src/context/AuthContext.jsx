@@ -5,6 +5,9 @@ const storageKey = "srms_auth";
 
 export const AuthContext = createContext(null);
 
+let _toastFn = null;
+export function setAuthToast(fn) { _toastFn = fn; }
+
 export function AuthProvider({ children }) {
   const [auth, setAuth] = useState(() => {
     const stored = localStorage.getItem(storageKey);
@@ -69,11 +72,13 @@ export function AuthProvider({ children }) {
         setBootstrapping(true);
         setAuth(nextAuth);
         localStorage.setItem(storageKey, JSON.stringify(nextAuth));
+        _toastFn?.("Login successful! Welcome back.", "success");
         return nextAuth;
       },
       logout() {
         localStorage.removeItem(storageKey);
         setAuth({ token: null, user: null, profile: null });
+        _toastFn?.("Logged out successfully.", "info");
       },
       async refreshProfile() {
         const response = await authService.profile();

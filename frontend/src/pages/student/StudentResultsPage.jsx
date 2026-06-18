@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
+import { FiLoader } from "react-icons/fi";
 import { api } from "../../services/api.js";
 import { downloadFile } from "../../services/downloadService.js";
 import { useAuth } from "../../hooks/useAuth.js";
+import { useToast } from "../../context/ToastContext.jsx";
 import { PageHero } from "../../components/PageHero.jsx";
 import { SectionCard } from "../../components/SectionCard.jsx";
 import { DataTable } from "../../components/DataTable.jsx";
-import { LoadingState } from "../../components/LoadingState.jsx";
+import { DashboardSkeleton } from "../../components/Skeleton.jsx";
 import { formatCgpa, formatPercentage } from "../../utils/resultHelpers.js";
 
 export function StudentResultsPage() {
   const { auth } = useAuth();
   const [payload, setPayload] = useState(null);
   const [downloading, setDownloading] = useState(false);
+  const showToast = useToast();
 
   useEffect(() => {
     if (!auth.profile?.id) return;
@@ -22,28 +25,39 @@ export function StudentResultsPage() {
     setDownloading(true);
     try {
       await downloadFile(`/results/student/${auth.profile.id}/marksheet`, `${auth.profile.roll_number}-marksheet.pdf`);
+      showToast("Marksheet downloaded successfully.", "success");
+    } catch {
+      showToast("Failed to download marksheet. Please try again.", "error");
     } finally {
       setDownloading(false);
     }
   }
 
   if (!payload) {
-    return <LoadingState label="Loading your results..." />;
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Student · Results"
+        eyebrow="Student - Results"
         title="Review subject-wise scores, grades, and semester performance."
         description="Your marksheet overview is live here, and you can download a polished PDF copy for academic or placement documentation."
         actions={
           <button
             type="button"
             onClick={handleDownload}
-            className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            disabled={downloading}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {downloading ? "Preparing PDF..." : "Download Marksheet"}
+            {downloading ? (
+              <>
+                <FiLoader className="animate-spin" />
+                Preparing PDF...
+              </>
+            ) : (
+              "Download Marksheet"
+            )}
           </button>
         }
       />

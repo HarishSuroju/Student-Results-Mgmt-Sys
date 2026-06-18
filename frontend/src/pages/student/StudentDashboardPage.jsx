@@ -5,7 +5,7 @@ import { PageHero } from "../../components/PageHero.jsx";
 import { StatCard } from "../../components/StatCard.jsx";
 import { SectionCard } from "../../components/SectionCard.jsx";
 import { Timeline } from "../../components/Timeline.jsx";
-import { LoadingState } from "../../components/LoadingState.jsx";
+import { DashboardSkeleton } from "../../components/Skeleton.jsx";
 import { formatCgpa, formatPercentage } from "../../utils/resultHelpers.js";
 
 export function StudentDashboardPage() {
@@ -30,7 +30,7 @@ export function StudentDashboardPage() {
   }, [auth.profile?.semester]);
 
   if (!payload) {
-    return <LoadingState label="Loading your dashboard..." />;
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -53,23 +53,27 @@ export function StudentDashboardPage() {
         </SectionCard>
 
         <SectionCard title="Recent Results" subtitle="Your latest subject-wise performance entries.">
-          <div className="space-y-3">
-            {payload.results.slice(-5).reverse().map((result) => (
-              <div key={result.id} className="rounded-2xl bg-slate-50 px-4 py-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-slate-900">{result.subject_name}</p>
-                    <p className="text-sm text-slate-500">
-                      {result.subject_code} · Semester {result.semester}
-                    </p>
-                  </div>
-                  <div className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">
-                    {result.marks} / {result.grade}
+          {payload.results.length ? (
+            <div className="space-y-3">
+              {payload.results.slice(-5).reverse().map((result) => (
+                <div key={result.id} className="rounded-2xl bg-slate-50 px-4 py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-semibold text-slate-900">{result.subject_name}</p>
+                      <p className="text-sm text-slate-500">
+                        {result.subject_code} - Semester {result.semester}
+                      </p>
+                    </div>
+                    <div className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">
+                      {result.marks} / {result.grade}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="py-6 text-center text-sm text-slate-500">No results available yet. Check back later.</p>
+          )}
         </SectionCard>
       </div>
     </div>

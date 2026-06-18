@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { FiLoader } from "react-icons/fi";
 import { api } from "../../services/api.js";
+import { useToast } from "../../context/ToastContext.jsx";
 import { PageHero } from "../../components/PageHero.jsx";
 import { SectionCard } from "../../components/SectionCard.jsx";
 import { DataTable } from "../../components/DataTable.jsx";
@@ -17,6 +19,8 @@ export function FacultyMarksPage() {
   const [subjects, setSubjects] = useState([]);
   const [results, setResults] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const showToast = useToast();
   const { register, handleSubmit, reset } = useForm({ defaultValues: blankValues });
 
   async function loadData() {
@@ -35,11 +39,11 @@ export function FacultyMarksPage() {
   }, []);
 
   const studentOptions = useMemo(
-    () => students.map((student) => ({ value: student.id, label: `${student.roll_number} · ${student.name}` })),
+    () => students.map((student) => ({ value: student.id, label: `${student.roll_number} - ${student.name}` })),
     [students],
   );
   const subjectOptions = useMemo(
-    () => subjects.map((subject) => ({ value: subject.id, label: `${subject.subject_code} · ${subject.subject_name}` })),
+    () => subjects.map((subject) => ({ value: subject.id, label: `${subject.subject_code} - ${subject.subject_name}` })),
     [subjects],
   );
 
@@ -51,15 +55,24 @@ export function FacultyMarksPage() {
       semester: Number(values.semester),
     };
 
-    if (editingItem) {
-      await api.put(`/results/${editingItem.id}`, payload);
-    } else {
-      await api.post("/results", payload);
-    }
+    setSaving(true);
+    try {
+      if (editingItem) {
+        await api.put(`/results/${editingItem.id}`, payload);
+        showToast("Marks updated successfully.", "success");
+      } else {
+        await api.post("/results", payload);
+        showToast("Marks submitted successfully.", "success");
+      }
 
-    setEditingItem(null);
-    reset(blankValues);
-    await loadData();
+      setEditingItem(null);
+      reset(blankValues);
+      await loadData();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to save marks.", "error");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleEdit(item) {
@@ -75,7 +88,7 @@ export function FacultyMarksPage() {
   return (
     <div className="space-y-6">
       <PageHero
-        eyebrow="Faculty · Marks"
+        eyebrow="Faculty - Marks"
         title="Add marks, update entries, and keep academic scoring accurate."
         description="Marks are validated from 0 to 100 and automatically translated to grades based on the configured SRMS grading rules."
       />
@@ -136,8 +149,19 @@ export function FacultyMarksPage() {
             </label>
 
             <div className="flex flex-wrap gap-3">
-              <button type="submit" className="rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
-                {editingItem ? "Update Marks" : "Submit Marks"}
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {saving ? (
+                  <>
+                    <FiLoader className="animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>{editingItem ? "Update Marks" : "Submit Marks"}</>
+                )}
               </button>
               {editingItem ? (
                 <button

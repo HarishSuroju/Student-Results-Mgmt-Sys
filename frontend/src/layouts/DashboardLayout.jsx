@@ -8,10 +8,19 @@ export function DashboardLayout() {
   const { auth, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navItems = navItemsByRole[auth.user.role];
+  const initials = (auth.user.username || "U").slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <div className="flex min-h-screen">
+        {/* Mobile backdrop */}
+        {sidebarOpen ? (
+          <div
+            className="fixed inset-0 z-30 bg-slate-900/60 backdrop-blur-sm lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        ) : null}
+
         <aside
           className={`fixed inset-y-0 left-0 z-40 w-72 border-r border-white/10 bg-slate-950/95 p-6 backdrop-blur transition-transform lg:static lg:translate-x-0 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -31,7 +40,7 @@ export function DashboardLayout() {
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition ${
-                    isActive ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-slate-300 hover:bg-white/8"
+                    isActive ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-slate-300 hover:bg-white/10"
                   }`
                 }
               >
@@ -52,7 +61,7 @@ export function DashboardLayout() {
         </aside>
 
         <div className="flex min-h-screen flex-1 flex-col bg-[linear-gradient(180deg,_#f7fafc_0%,_#e2e8f0_100%)] text-slate-900">
-          <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 px-4 py-4 backdrop-blur md:px-8">
+          <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 px-4 py-4 backdrop-blur md:px-8">
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
               <button
                 type="button"
@@ -61,9 +70,14 @@ export function DashboardLayout() {
               >
                 {sidebarOpen ? <FiX /> : <FiMenu />}
               </button>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Signed in as</p>
-                <h2 className="font-display text-xl">{auth.user.username}</h2>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">
+                  {initials}
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Signed in as</p>
+                  <h2 className="font-display text-xl">{auth.user.username}</h2>
+                </div>
               </div>
               <div className="rounded-2xl bg-slate-900 px-4 py-3 text-right text-white shadow-lg shadow-slate-900/10">
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-300">{roleLabels[auth.user.role]}</p>

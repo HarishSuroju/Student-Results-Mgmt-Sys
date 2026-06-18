@@ -3,7 +3,7 @@ import { api } from "../../services/api.js";
 import { PageHero } from "../../components/PageHero.jsx";
 import { StatCard } from "../../components/StatCard.jsx";
 import { SectionCard } from "../../components/SectionCard.jsx";
-import { LoadingState } from "../../components/LoadingState.jsx";
+import { DashboardSkeleton } from "../../components/Skeleton.jsx";
 
 export function AdminDashboardPage() {
   const [analytics, setAnalytics] = useState(null);
@@ -13,7 +13,7 @@ export function AdminDashboardPage() {
   }, []);
 
   if (!analytics) {
-    return <LoadingState label="Loading analytics dashboard..." />;
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -34,21 +34,25 @@ export function AdminDashboardPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr,0.9fr]">
         <SectionCard title="Top Performers" subtitle="Highest average marks across the current academic records.">
-          <div className="space-y-4">
-            {analytics.topPerformers.map((student, index) => (
-              <div key={student.roll_number} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-4">
-                <div>
-                  <p className="font-semibold text-slate-900">
-                    #{index + 1} {student.name}
+          {analytics.topPerformers.length ? (
+            <div className="space-y-4">
+              {analytics.topPerformers.map((student, index) => (
+                <div key={student.roll_number} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-4">
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      #{index + 1} {student.name}
+                    </p>
+                    <p className="text-sm text-slate-500">{student.roll_number}</p>
+                  </div>
+                  <p className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600">
+                    {student.average_marks}%
                   </p>
-                  <p className="text-sm text-slate-500">{student.roll_number}</p>
                 </div>
-                <p className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600">
-                  {student.average_marks}%
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="py-6 text-center text-sm text-slate-500">No results recorded yet.</p>
+          )}
         </SectionCard>
 
         <SectionCard title="Academic Signals" subtitle="Use these quick notes to guide the next admin actions.">

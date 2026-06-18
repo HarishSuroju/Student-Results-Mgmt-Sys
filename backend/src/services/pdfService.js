@@ -8,7 +8,7 @@ function createMarksheetPdf({ student, results }) {
     align: "center",
   });
   doc.moveDown(0.5);
-  doc.fontSize(12).fillColor("#111827").text("College Name: Summit Ridge University", {
+  doc.fontSize(12).fillColor("#111827").text("Student Result Management System", {
     align: "center",
   });
   doc.moveDown(1.5);

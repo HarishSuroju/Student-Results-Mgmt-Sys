@@ -1,33 +1,46 @@
+import { FiInbox } from "react-icons/fi";
+
 export function DataTable({ columns, rows, onEdit, onDelete, emptyMessage = "No records found." }) {
   if (!rows.length) {
-    return <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">{emptyMessage}</p>;
+    return (
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-12 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+          <FiInbox className="text-xl text-slate-400" />
+        </div>
+        <p className="mt-4 text-sm font-medium text-slate-500">{emptyMessage}</p>
+        <p className="mt-1 text-xs text-slate-400">Try adjusting your search or add new records.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-2xl border border-slate-200/80">
       <table className="min-w-full divide-y divide-slate-200">
-        <thead>
+        <thead className="bg-slate-50">
           <tr>
             {columns.map((column) => (
-              <th key={column.label} className="px-4 py-3 text-left text-xs uppercase tracking-[0.2em] text-slate-500">
+              <th key={column.label} className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
                 {column.label}
               </th>
             ))}
             {(onEdit || onDelete) ? (
-              <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.2em] text-slate-500">Actions</th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Actions</th>
             ) : null}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
-          {rows.map((row) => (
-            <tr key={row.id} className="align-top">
+        <tbody className="divide-y divide-slate-100 bg-white">
+          {rows.map((row, index) => (
+            <tr
+              key={row.id || index}
+              className={`align-top transition-colors hover:bg-indigo-50/40 ${index % 2 === 1 ? "bg-slate-50/50" : ""}`}
+            >
               {columns.map((column) => (
-                <td key={column.label} className="px-4 py-4 text-sm text-slate-700">
+                <td key={column.label} className="px-5 py-4 text-sm text-slate-700">
                   {column.render ? column.render(row) : row[column.key]}
                 </td>
               ))}
               {(onEdit || onDelete) ? (
-                <td className="px-4 py-4">
+                <td className="px-5 py-4">
                   <div className="flex flex-wrap gap-2">
                     {onEdit ? (
                       <button
