@@ -12,19 +12,64 @@ export function SubjectsPage() {
 
   const fields = useMemo(
     () => [
-      { name: "subjectCode", label: "Subject Code", type: "text", placeholder: "CS101" },
-      { name: "subjectName", label: "Subject Name", type: "text", placeholder: "Programming Fundamentals" },
+      {
+        name: "subjectCode",
+        label: "Subject Code",
+        type: "text",
+        placeholder: "CS101",
+        validation: {
+          required: "Subject Code is required.",
+          pattern: {
+            value: /^[a-zA-Z0-9-]+$/,
+            message: "Subject Code must be alphanumeric (hyphens allowed).",
+          },
+        },
+      },
+      {
+        name: "subjectName",
+        label: "Subject Name",
+        type: "text",
+        placeholder: "Programming Fundamentals",
+        validation: {
+          required: "Subject Name is required.",
+          minLength: { value: 2, message: "Subject Name must be at least 2 characters." },
+        },
+      },
       {
         name: "courseId",
         label: "Course",
         type: "select",
         options: courses.map((course) => ({ value: course.id, label: course.course_name })),
+        validation: {
+          required: "Course selection is required.",
+        },
       },
-      { name: "semester", label: "Semester", type: "number", placeholder: "Semester number" },
-      { name: "credits", label: "Credits", type: "number", placeholder: "Credit value" },
+      {
+        name: "semester",
+        label: "Semester",
+        type: "number",
+        placeholder: "Semester number",
+        validation: {
+          required: "Semester is required.",
+          min: { value: 1, message: "Semester must be between 1 and 8." },
+          max: { value: 8, message: "Semester must be between 1 and 8." },
+        },
+      },
+      {
+        name: "credits",
+        label: "Credits",
+        type: "number",
+        placeholder: "Credit value",
+        validation: {
+          required: "Credits are required.",
+          min: { value: 1, message: "Credits must be between 1 and 6." },
+          max: { value: 6, message: "Credits must be between 1 and 6." },
+        },
+      },
     ],
     [courses],
   );
+
 
   return (
     <div className="space-y-6">

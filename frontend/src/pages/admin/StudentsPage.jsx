@@ -12,22 +12,98 @@ export function StudentsPage() {
 
   const fields = useMemo(
     () => [
-      { name: "username", label: "Username", type: "text", placeholder: "student.username" },
-      { name: "email", label: "Email", type: "email", placeholder: "student@srms.edu" },
-      { name: "password", label: "Password", type: "password", placeholder: "Only required for create or reset" },
-      { name: "rollNumber", label: "Roll Number", type: "text", placeholder: "SRMS-2026-001" },
-      { name: "name", label: "Full Name", type: "text", placeholder: "Enter student name" },
-      { name: "phone", label: "Phone", type: "tel", placeholder: "9876543210" },
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+        placeholder: "student.username",
+        validation: {
+          required: "Username is required.",
+          minLength: { value: 3, message: "Username must be at least 3 characters." },
+        },
+      },
+      {
+        name: "email",
+        label: "Email",
+        type: "email",
+        placeholder: "student@srms.edu",
+        validation: {
+          required: "Email is required.",
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: "Please enter a valid email address.",
+          },
+        },
+      },
+      {
+        name: "password",
+        label: "Password",
+        type: "password",
+        placeholder: "Only required for create or reset",
+        validation: (editingItem) => ({
+          minLength: { value: 6, message: "Password must be at least 6 characters." },
+          ...(!editingItem ? { required: "Password is required for new accounts." } : {}),
+        }),
+      },
+      {
+        name: "rollNumber",
+        label: "Roll Number",
+        type: "text",
+        placeholder: "SRMS-2026-001",
+        validation: {
+          required: "Roll Number is required.",
+          pattern: {
+            value: /^[a-zA-Z0-9-]+$/,
+            message: "Roll Number must be alphanumeric (hyphens allowed).",
+          },
+        },
+      },
+      {
+        name: "name",
+        label: "Full Name",
+        type: "text",
+        placeholder: "Enter student name",
+        validation: {
+          required: "Full name is required.",
+          minLength: { value: 2, message: "Name must be at least 2 characters." },
+        },
+      },
+      {
+        name: "phone",
+        label: "Phone",
+        type: "tel",
+        placeholder: "9876543210",
+        validation: {
+          pattern: {
+            value: /^\d{10}$/,
+            message: "Phone number must be exactly 10 digits.",
+          },
+        },
+      },
       {
         name: "courseId",
         label: "Course",
         type: "select",
         options: courses.map((course) => ({ value: course.id, label: course.course_name })),
+        validation: {
+          required: "Course selection is required.",
+        },
       },
-      { name: "semester", label: "Semester", type: "number", placeholder: "Current semester" },
+      {
+        name: "semester",
+        label: "Semester",
+        type: "number",
+        placeholder: "Current semester",
+        validation: {
+          required: "Semester is required.",
+          min: { value: 1, message: "Semester must be between 1 and 8." },
+          max: { value: 8, message: "Semester must be between 1 and 8." },
+        },
+      },
     ],
     [courses],
   );
+
 
   return (
     <div className="space-y-6">

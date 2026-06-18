@@ -56,15 +56,15 @@ export function StudentDashboardPage() {
           {payload.results.length ? (
             <div className="space-y-3">
               {payload.results.slice(-5).reverse().map((result) => (
-                <div key={result.id} className="rounded-2xl bg-slate-50 px-4 py-4">
+                <div key={result.id} className="rounded-2xl border border-white/5 bg-white/[0.01] px-4 py-4 hover:bg-white/[0.02] transition-colors">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-slate-900">{result.subject_name}</p>
-                      <p className="text-sm text-slate-500">
+                      <p className="font-bold text-white">{result.subject_name}</p>
+                      <p className="text-xs text-slate-500 mt-1">
                         {result.subject_code} - Semester {result.semester}
                       </p>
                     </div>
-                    <div className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">
+                    <div className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 text-sm font-bold text-indigo-300">
                       {result.marks} / {result.grade}
                     </div>
                   </div>

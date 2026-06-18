@@ -37,14 +37,14 @@ export function AdminDashboardPage() {
           {analytics.topPerformers.length ? (
             <div className="space-y-4">
               {analytics.topPerformers.map((student, index) => (
-                <div key={student.roll_number} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-4">
+                <div key={student.roll_number} className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.01] px-4 py-4 hover:bg-white/[0.02] transition-colors">
                   <div>
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-bold text-white">
                       #{index + 1} {student.name}
                     </p>
-                    <p className="text-sm text-slate-500">{student.roll_number}</p>
+                    <p className="text-xs text-slate-500 mt-1">{student.roll_number}</p>
                   </div>
-                  <p className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600">
+                  <p className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 text-sm font-bold text-indigo-300">
                     {student.average_marks}%
                   </p>
                 </div>
@@ -57,13 +57,13 @@ export function AdminDashboardPage() {
 
         <SectionCard title="Academic Signals" subtitle="Use these quick notes to guide the next admin actions.">
           <div className="grid gap-4">
-            <div className="rounded-2xl bg-slate-950 p-5 text-white">
-              <p className="text-sm uppercase tracking-[0.3em] text-sky-300">Pass Percentage</p>
-              <p className="mt-3 font-display text-5xl">{analytics.passPercentage || 0}%</p>
+            <div className="rounded-2xl border border-white/5 bg-[#090d16] p-5 shadow-inner">
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">Pass Percentage</p>
+              <p className="mt-3 font-display text-5xl font-black text-white">{analytics.passPercentage || 0}%</p>
             </div>
-            <div className="rounded-2xl bg-amber-50 p-5">
-              <p className="font-semibold text-amber-900">Admin focus</p>
-              <p className="mt-2 text-sm leading-7 text-amber-800">
+            <div className="rounded-2xl border border-amber-500/10 bg-amber-500/5 p-5">
+              <p className="font-bold text-amber-300">Admin focus</p>
+              <p className="mt-2 text-sm leading-6 text-amber-400">
                 Use the analytics page to compare course-wise and semester-wise outcomes, then update faculty or subject
                 coverage where performance dips appear.
               </p>

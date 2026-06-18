@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiLoader } from "react-icons/fi";
+import { FiLoader, FiDownload } from "react-icons/fi";
 import { api } from "../../services/api.js";
 import { downloadFile } from "../../services/downloadService.js";
 import { useAuth } from "../../hooks/useAuth.js";
@@ -48,15 +48,18 @@ export function StudentResultsPage() {
             type="button"
             onClick={handleDownload}
             disabled={downloading}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-70 active:scale-95 shadow-lg shadow-emerald-600/10"
           >
             {downloading ? (
               <>
-                <FiLoader className="animate-spin" />
+                <FiLoader className="animate-spin text-lg" />
                 Preparing PDF...
               </>
             ) : (
-              "Download Marksheet"
+              <>
+                <FiDownload className="text-lg" />
+                Download Marksheet
+              </>
             )}
           </button>
         }
@@ -64,13 +67,13 @@ export function StudentResultsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <SectionCard title="Total Marks" subtitle="Aggregate marks across listed result entries.">
-          <p className="font-display text-5xl text-slate-950">{payload.summary.totalMarks}</p>
+          <p className="font-display text-5xl font-black text-white">{payload.summary.totalMarks}</p>
         </SectionCard>
         <SectionCard title="Percentage" subtitle="Overall percentage across listed subjects.">
-          <p className="font-display text-5xl text-slate-950">{formatPercentage(payload.summary.percentage)}</p>
+          <p className="font-display text-5xl font-black text-white">{formatPercentage(payload.summary.percentage)}</p>
         </SectionCard>
         <SectionCard title="CGPA" subtitle="Credit-weighted cumulative GPA.">
-          <p className="font-display text-5xl text-slate-950">{formatCgpa(payload.summary.cgpa)}</p>
+          <p className="font-display text-5xl font-black text-white">{formatCgpa(payload.summary.cgpa)}</p>
         </SectionCard>
       </div>
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FiLoader } from "react-icons/fi";
+import { FiAlertCircle, FiLoader } from "react-icons/fi";
 import { api } from "../services/api.js";
 import { useToast } from "../context/ToastContext.jsx";
 import { SectionCard } from "./SectionCard.jsx";
@@ -32,8 +32,15 @@ export function CrudManager({
   const [saving, setSaving] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const showToast = useToast();
+  
   const defaultValues = useMemo(() => buildDefaultValues(fields), [fields]);
-  const { register, handleSubmit, reset } = useForm({ defaultValues });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    clearErrors,
+  } = useForm({ defaultValues });
 
   const loadRows = useCallback(async () => {
     setLoading(true);
@@ -57,7 +64,9 @@ export function CrudManager({
     }
 
     const keyword = search.trim().toLowerCase();
-    return rows.filter((row) => searchKeys.some((key) => String(row[key] || "").toLowerCase().includes(keyword)));
+    return rows.filter((row) =>
+      searchKeys.some((key) => String(row[key] || "").toLowerCase().includes(keyword)),
+    );
   }, [rows, search, searchKeys]);
 
   async function onSubmit(values) {
@@ -74,6 +83,7 @@ export function CrudManager({
       }
 
       setEditingItem(null);
+      clearErrors();
       reset(defaultValues);
       await loadRows();
       onSaved?.();
@@ -100,11 +110,13 @@ export function CrudManager({
   }
 
   function handleEdit(item) {
+    clearErrors();
     setEditingItem(item);
     reset({ ...defaultValues, ...toFormValues(item) });
   }
 
   function handleCancel() {
+    clearErrors();
     setEditingItem(null);
     reset(defaultValues);
   }
@@ -120,7 +132,7 @@ export function CrudManager({
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search records..."
-              className="min-w-56 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-indigo-500 focus:bg-white"
+              className="min-w-56 rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-indigo-500 focus:bg-white"
             />
           }
         >
@@ -142,37 +154,56 @@ export function CrudManager({
 
         <SectionCard title={editingItem ? `Edit ${formTitle}` : formTitle} subtitle={formSubtitle}>
           <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-            {fields.map((field) => (
-              <label key={field.name} className="grid gap-2 text-sm font-medium text-slate-700">
-                {field.label}
-                {field.type === "select" ? (
-                  <select
-                    {...register(field.name)}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-indigo-500 focus:bg-white"
-                  >
-                    <option value="">{field.placeholder || `Select ${field.label}`}</option>
-                    {field.options?.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    {...register(field.name)}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-indigo-500 focus:bg-white"
-                  />
-                )}
-              </label>
-            ))}
+            {fields.map((field) => {
+              const rules = typeof field.validation === "function" ? field.validation(editingItem) : field.validation;
+              const hasError = !!errors[field.name];
+
+              return (
+                <label key={field.name} className="grid gap-2 text-sm font-semibold text-slate-700">
+                  {field.label}
+                  {field.type === "select" ? (
+                    <select
+                      {...register(field.name, rules)}
+                      className={`rounded-2xl border bg-slate-50 px-4 py-3 outline-none transition focus:bg-white ${
+                        hasError
+                          ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                          : "border-slate-200 focus:border-indigo-500"
+                      }`}
+                    >
+                      <option value="">{field.placeholder || `Select ${field.label}`}</option>
+                      {field.options?.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type}
+                      placeholder={field.placeholder}
+                      {...register(field.name, rules)}
+                      className={`rounded-2xl border bg-slate-50 px-4 py-3 outline-none transition focus:bg-white ${
+                        hasError
+                          ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                          : "border-slate-200 focus:border-indigo-500"
+                      }`}
+                    />
+                  )}
+                  {hasError && (
+                    <span className="text-xs font-semibold text-rose-500 flex items-center gap-1.5 mt-0.5 animate-scale-in">
+                      <FiAlertCircle className="shrink-0" />
+                      {errors[field.name].message}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
 
             <div className="flex flex-wrap gap-3 pt-2">
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70 active:scale-98"
               >
                 {saving ? (
                   <>
@@ -187,7 +218,7 @@ export function CrudManager({
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
+                  className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-900 active:scale-98"
                 >
                   Cancel
                 </button>
@@ -200,7 +231,13 @@ export function CrudManager({
       <ConfirmDialog
         open={!!deletingItem}
         title={`Delete ${formTitle}?`}
-        message={`Are you sure you want to delete "${deletingItem?.name || deletingItem?.course_name || deletingItem?.subject_name || deletingItem?.faculty_code || "this record"}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${
+          deletingItem?.name ||
+          deletingItem?.course_name ||
+          deletingItem?.subject_name ||
+          deletingItem?.faculty_code ||
+          "this record"
+        }"? This action cannot be undone.`}
         confirmLabel="Delete"
         onConfirm={confirmDelete}
         onCancel={() => setDeletingItem(null)}

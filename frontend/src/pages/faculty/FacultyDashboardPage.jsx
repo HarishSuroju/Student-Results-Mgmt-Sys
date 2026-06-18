@@ -42,7 +42,7 @@ export function FacultyDashboardPage() {
           <div className="flex flex-wrap gap-3">
             {managedSubjects.length ? (
               managedSubjects.map((subject) => (
-                <span key={subject} className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">
+                <span key={subject} className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 text-sm font-bold text-indigo-300">
                   {subject}
                 </span>
               ))
@@ -56,15 +56,15 @@ export function FacultyDashboardPage() {
           {results.length ? (
             <div className="space-y-3">
               {results.slice(0, 5).map((item) => (
-                <div key={item.id} className="rounded-2xl bg-slate-50 px-4 py-4">
+                <div key={item.id} className="rounded-2xl border border-white/5 bg-white/[0.01] px-4 py-4 hover:bg-white/[0.02] transition-colors">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-slate-900">{item.student_name}</p>
-                      <p className="text-sm text-slate-500">
+                      <p className="font-bold text-white">{item.student_name}</p>
+                      <p className="text-xs text-slate-500 mt-1">
                         {item.subject_name} - Semester {item.semester}
                       </p>
                     </div>
-                    <div className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+                    <div className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-300">
                       {item.marks} / {item.grade}
                     </div>
                   </div>

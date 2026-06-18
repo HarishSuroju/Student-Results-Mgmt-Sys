@@ -15,9 +15,28 @@ export function CoursesPage() {
         formTitle="Course"
         formSubtitle="Create or update the degree and diploma options available in the institution."
         fields={[
-          { name: "courseName", label: "Course Name", type: "text", placeholder: "B.Tech Computer Science" },
-          { name: "duration", label: "Duration", type: "text", placeholder: "4 Years" },
+          {
+            name: "courseName",
+            label: "Course Name",
+            type: "text",
+            placeholder: "B.Tech Computer Science",
+            validation: {
+              required: "Course Name is required.",
+              minLength: { value: 3, message: "Course Name must be at least 3 characters." },
+            },
+          },
+          {
+            name: "duration",
+            label: "Duration",
+            type: "text",
+            placeholder: "4 Years",
+            validation: {
+              required: "Duration is required.",
+              minLength: { value: 2, message: "Duration must be at least 2 characters." },
+            },
+          },
         ]}
+
         columns={[
           { label: "Course", key: "course_name" },
           { label: "Duration", key: "duration" },

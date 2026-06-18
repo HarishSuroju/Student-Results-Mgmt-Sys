@@ -7,12 +7,12 @@ export function StatCard({ label, value, hint, accent = "indigo" }) {
   };
 
   return (
-    <div className="rounded-[1.75rem] border border-white/70 bg-white p-6 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.5)]">
-      <div className={`inline-flex rounded-full bg-gradient-to-r px-3 py-1 text-xs font-semibold text-white ${accentClasses[accent]}`}>
+    <div className="rounded-[1.75rem] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-sm shadow-[0_20px_70px_-45px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-white/10 hover:bg-white/[0.03]">
+      <div className={`inline-flex rounded-full bg-gradient-to-r px-3.5 py-1 text-xs font-bold text-white ${accentClasses[accent]}`}>
         {label}
       </div>
-      <p className="mt-5 font-display text-4xl text-slate-950">{value}</p>
-      <p className="mt-2 text-sm text-slate-500">{hint}</p>
+      <p className="mt-5 font-display text-4xl font-extrabold text-white">{value}</p>
+      <p className="mt-2.5 text-xs font-semibold text-slate-500">{hint}</p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FiLoader } from "react-icons/fi";
+import { FiAlertCircle, FiLoader } from "react-icons/fi";
 import { api } from "../../services/api.js";
 import { useToast } from "../../context/ToastContext.jsx";
 import { PageHero } from "../../components/PageHero.jsx";
@@ -21,17 +21,28 @@ export function FacultyMarksPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [saving, setSaving] = useState(false);
   const showToast = useToast();
-  const { register, handleSubmit, reset } = useForm({ defaultValues: blankValues });
+  
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    clearErrors,
+  } = useForm({ defaultValues: blankValues });
 
   async function loadData() {
-    const [studentsResponse, subjectsResponse, resultsResponse] = await Promise.all([
-      api.get("/students"),
-      api.get("/subjects"),
-      api.get("/results"),
-    ]);
-    setStudents(studentsResponse.data);
-    setSubjects(subjectsResponse.data);
-    setResults(resultsResponse.data);
+    try {
+      const [studentsResponse, subjectsResponse, resultsResponse] = await Promise.all([
+        api.get("/students"),
+        api.get("/subjects"),
+        api.get("/results"),
+      ]);
+      setStudents(studentsResponse.data);
+      setSubjects(subjectsResponse.data);
+      setResults(resultsResponse.data);
+    } catch {
+      showToast("Failed to load records.", "error");
+    }
   }
 
   useEffect(() => {
@@ -66,6 +77,7 @@ export function FacultyMarksPage() {
       }
 
       setEditingItem(null);
+      clearErrors();
       reset(blankValues);
       await loadData();
     } catch (err) {
@@ -76,6 +88,7 @@ export function FacultyMarksPage() {
   }
 
   function handleEdit(item) {
+    clearErrors();
     setEditingItem(item);
     reset({
       studentId: String(item.student_id),
@@ -85,22 +98,36 @@ export function FacultyMarksPage() {
     });
   }
 
+  function handleCancel() {
+    clearErrors();
+    setEditingItem(null);
+    reset(blankValues);
+  }
+
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Faculty - Marks"
         title="Add marks, update entries, and keep academic scoring accurate."
-        description="Marks are validated from 0 to 100 and automatically translated to grades based on the configured SRMS grading rules."
+        description="Marks are validated from 0 to 100 and automatically translated to grades based on the configured institution grading scale."
       />
 
-      <div className="grid gap-6 xl:grid-cols-[0.85fr,1.15fr]">
-        <SectionCard title={editingItem ? "Update Marks" : "Add Marks"} subtitle="Faculty can add or revise marks for any visible student record.">
+      <div className="grid gap-6 xl:grid-cols-[0.9fr,1.1fr]">
+        <SectionCard
+          title={editingItem ? "Update Marks" : "Add Marks"}
+          subtitle="Faculty can add or revise marks for any visible student record."
+        >
           <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
+            {/* Student Dropdown */}
+            <label className="grid gap-2 text-sm font-semibold text-slate-700">
               Student
               <select
-                {...register("studentId")}
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-indigo-500 focus:bg-white"
+                {...register("studentId", { required: "Please select a student." })}
+                className={`rounded-2xl border bg-slate-50 px-4 py-3 outline-none transition focus:bg-white ${
+                  errors.studentId
+                    ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                    : "border-slate-200 focus:border-indigo-500"
+                }`}
               >
                 <option value="">Select student</option>
                 {studentOptions.map((option) => (
@@ -109,13 +136,24 @@ export function FacultyMarksPage() {
                   </option>
                 ))}
               </select>
+              {errors.studentId && (
+                <span className="text-xs font-semibold text-rose-500 flex items-center gap-1.5 mt-0.5 animate-scale-in">
+                  <FiAlertCircle className="shrink-0" />
+                  {errors.studentId.message}
+                </span>
+              )}
             </label>
 
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
+            {/* Subject Dropdown */}
+            <label className="grid gap-2 text-sm font-semibold text-slate-700">
               Subject
               <select
-                {...register("subjectId")}
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-indigo-500 focus:bg-white"
+                {...register("subjectId", { required: "Please select a subject." })}
+                className={`rounded-2xl border bg-slate-50 px-4 py-3 outline-none transition focus:bg-white ${
+                  errors.subjectId
+                    ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                    : "border-slate-200 focus:border-indigo-500"
+                }`}
               >
                 <option value="">Select subject</option>
                 {subjectOptions.map((option) => (
@@ -124,35 +162,69 @@ export function FacultyMarksPage() {
                   </option>
                 ))}
               </select>
+              {errors.subjectId && (
+                <span className="text-xs font-semibold text-rose-500 flex items-center gap-1.5 mt-0.5 animate-scale-in">
+                  <FiAlertCircle className="shrink-0" />
+                  {errors.subjectId.message}
+                </span>
+              )}
             </label>
 
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
-              Marks
+            {/* Marks Input */}
+            <label className="grid gap-2 text-sm font-semibold text-slate-700">
+              Marks (0 - 100)
               <input
                 type="number"
-                min="0"
-                max="100"
                 placeholder="0 - 100"
-                {...register("marks")}
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-indigo-500 focus:bg-white"
+                {...register("marks", {
+                  required: "Marks are required.",
+                  min: { value: 0, message: "Marks cannot be less than 0." },
+                  max: { value: 100, message: "Marks cannot exceed 100." },
+                })}
+                className={`rounded-2xl border bg-slate-50 px-4 py-3 outline-none transition focus:bg-white ${
+                  errors.marks
+                    ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                    : "border-slate-200 focus:border-indigo-500"
+                }`}
               />
+              {errors.marks && (
+                <span className="text-xs font-semibold text-rose-500 flex items-center gap-1.5 mt-0.5 animate-scale-in">
+                  <FiAlertCircle className="shrink-0" />
+                  {errors.marks.message}
+                </span>
+              )}
             </label>
 
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
-              Semester
+            {/* Semester Input */}
+            <label className="grid gap-2 text-sm font-semibold text-slate-700">
+              Semester (1 - 8)
               <input
                 type="number"
-                placeholder="Semester"
-                {...register("semester")}
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-indigo-500 focus:bg-white"
+                placeholder="Current semester"
+                {...register("semester", {
+                  required: "Semester is required.",
+                  min: { value: 1, message: "Semester must be between 1 and 8." },
+                  max: { value: 8, message: "Semester must be between 1 and 8." },
+                })}
+                className={`rounded-2xl border bg-slate-50 px-4 py-3 outline-none transition focus:bg-white ${
+                  errors.semester
+                    ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                    : "border-slate-200 focus:border-indigo-500"
+                }`}
               />
+              {errors.semester && (
+                <span className="text-xs font-semibold text-rose-500 flex items-center gap-1.5 mt-0.5 animate-scale-in">
+                  <FiAlertCircle className="shrink-0" />
+                  {errors.semester.message}
+                </span>
+              )}
             </label>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 pt-2">
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70 active:scale-98"
               >
                 {saving ? (
                   <>
@@ -166,11 +238,8 @@ export function FacultyMarksPage() {
               {editingItem ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    setEditingItem(null);
-                    reset(blankValues);
-                  }}
-                  className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400"
+                  onClick={handleCancel}
+                  className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 active:scale-98"
                 >
                   Cancel
                 </button>
@@ -179,7 +248,10 @@ export function FacultyMarksPage() {
           </form>
         </SectionCard>
 
-        <SectionCard title="Student Directory" subtitle="Faculty can view student records while entering or updating marks.">
+        <SectionCard
+          title="Student Directory"
+          subtitle="Faculty can view student records while entering or updating marks."
+        >
           <DataTable
             columns={[
               { label: "Roll Number", key: "roll_number" },
